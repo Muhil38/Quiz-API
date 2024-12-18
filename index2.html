@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Quiz Game</title>
+</head>
+<body>
+    <div class="quiz-container">
+        <h1>Quiz Game</h1>
+        <div id="question-container">
+            <p id="question">Question will appear here</p>
+            <div id="answer-buttons"></div>
+        </div>
+        <button id="next-btn" style="display: none;">Next</button>
+        <button id="submit-btn" style="display: none;">Submit</button>
+        <p id="result" style="display: none;"></p>
+    </div>
+
+    <script>
+        var currentQuestionIndex = 0;
+        var score = 0;
+        var questions = [];
+
+        // Fetch random questions from the API
+        function fetchQuestions() {
+            var apiUrl = 'https://opentdb.com/api.php?amount=5&type=multiple'; // Fetch 5 random questions
+
+            fetch(apiUrl)
+                .then(function(response) {
+                    return response.json();
+                })
+                .then(function(data) {
+                    questions = data.results.map(function(questionObj) {
+                        return {
+                            question: questionObj.question,
+                            answers: shuffle([questionObj.correct_answer].concat(questionObj.incorrect_answers)),
+                            correct: questionObj.correct_answer
+                        };
+                    });
+                    showQuestion(questions[currentQuestionIndex]);
+                });
+        }
+
+        // Display the current question
+        function showQuestion(question) {
+            var questionElement = document.getElementById("question");
+            var answerButtons = document.getElementById("answer-buttons");
+
+            questionElement.innerHTML = question.question;
+            answerButtons.innerHTML = ''; // Clear previous answers
+
+            question.answers.forEach(function(answer) {
+                var button = document.createElement("button");
+                button.innerText = answer;
+                button.classList.add("answer-btn");
+                button.addEventListener("click", function() {
+                    selectAnswer(answer, question.correct);
+                });
+                answerButtons.appendChild(button);
+            });
+        }
+
+        // Handle answer selection
+        function selectAnswer(selectedAnswer, correctAnswer) {
+            if (selectedAnswer === correctAnswer) {
+                score++;
+            }
+            document.getElementById("next-btn").style.display = 'block';
+        }
+
+        // Shuffle function for randomizing answers
+        function shuffle(array) {
+            for (var i = array.length - 1; i > 0; i--) {
+                var j = Math.floor(Math.random() * (i + 1));
+                var temp = array[i];
+                array[i] = array[j];
+                array[j] = temp;
+            }
+            return array;
+        }
+
+        // Move to the next question
+        document.getElementById("next-btn").addEventListener("click", function() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                showQuestion(questions[currentQuestionIndex]);
+                this.style.display = 'none'; // Hide Next button
+            } else {
+                document.getElementById("question-container").style.display = 'none';
+                document.getElementById("submit-btn").style.display = 'block';
+            }
+        });
+
+        // Submit button to display final score
+        document.getElementById("submit-btn").addEventListener("click", function() {
+            document.getElementById("result").style.display = 'block';
+            document.getElementById("result").innerText = 'Your score: ' + score + ' out of ' + questions.length;
+        });
+
+        // Initialize the quiz by fetching questions
+        fetchQuestions();
+    </script>
+</body>
+</html>

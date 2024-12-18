@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Game</title>
+</head>
+<body>
+    
+<div class="quiz-container">
+    <h1>Quiz Game</h1>
+    <div id="question-container">
+        <p id="question">...?</p>
+        <div id="answer-buttons"></div>
+    </div>
+    <button id="next-btn" style="display: none;">Next</button>
+    <button id="submit-btn" style="display: none;">Submit</button>
+    <p id="result" style="display: none;"></p>
+</div>
+
+
+
+
+<script>
+
+    //stores the empty data to initialize to the variable
+    var currentQuestionIndex=0;
+    var score=0;
+    var questions = []; 
+
+
+    //fetching questions from the api
+    function fetchQuestions(){
+        var apiUrl = "https://opentdb.com/api.php?amount=5&type=multiple"
+    }
+
+    fetch(apiUrl)
+
+
+    //After receiving the response it converts the data into JSON format.
+    .then(function(response){
+        return response.json(); //converts the raw HTTP response into a JSON
+    })
+
+
+    .then(function(data){
+        questions=data.results.map(function(questionObj){
+            return{
+                question: questionObj.question,
+                answers: shuffle([questionObj.correct_answer].concat(questionObj.incorrect_answers)),
+
+                correct:questionObj.correct_answer
+            };
+        });
+        showQuestion(questions[currentQuestionIndex]);
+    });
+
+    //displaying questions and answers
+    function showQuestion(question){
+        var questionElement = document.getElementById("question");
+        var showAnswer = document.getElementById("answer-buttons");
+
+        questionElement.innerHTML = question.question;
+        showAnswer.innerHTML='';
+
+
+        //it checks the answers on by one using for each method
+        question.answers.forEach(function(answer){
+
+            var button = document.createElement("button");
+
+            button.innerText=answer;
+            button.classList.add("answer-btn");
+            button.addEventListener("click",function(){
+                selectAnswer(answer,question.correct);
+            });
+            answerButtons.appendChild(button);
+
+        });
+        
+}
+
+
+   //handling answer selection
+
+   function selectAnswer(selectedAnswer,correctAnswer){
+    if(selectedAnswer===correctAnswer){
+        score++;
+    }
+    document.getElementById("next-btn").style.display='block';
+
+   }
+
+
+
+   //moving to the next question
+   document.getElementById("next-btn").addEventListener("click",function(){
+    currentQuestionIndex++;
+
+    if (currentQuestionIndex < questions.length){
+        showQuestion(questions[currentQuestionIndex]);
+        this.style.display='none';
+    }
+    else{
+        document.getElementById("question-container").style.display='none';
+        document.getElementById("submit-btn").style.display='block';
+    }
+
+ });
+
+
+
+
+ //submitting and displaying the score
+ document.getElementById("submit-btn").addEventListener("click",function(){
+    document.getElementById("result").style.display='block';
+    document.getElementById("result").innerText='your score:'+ score + 'out of' + questions.length;
+ });
+
+ fetchQuestions();
+
+
+
+</script>
+      
+
+
+</body>
+</html>

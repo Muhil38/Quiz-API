@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Quiz Game</title>
+</head>
+<body>
+
+
+
+
+  
+
+
+
+
+
+    <h1>Sports Quiz</h1>
+    <div id="question-container">
+        <p id="question">Loading question...</p>
+        <div id="answer-buttons"></div>
+    </div>
+    <button id="next-btn" style="display: none;">Next</button>
+    <p id="score" style="display: none;"></p>
+
+    <script>
+        var currentQuestion = 0;   //this variable is used to track which question is currently on
+        var score = 0;            //this variable is used to store the score which initial value is 0
+        var quizData = [];       //an empty array which holds the questions which are fetch by the api
+
+
+
+
+        // Fetch random cricket questions from API
+
+        function fetchQuestions() {                                                  //declare function to fetch the questions from api
+            fetch('https://opentdb.com/api.php?amount=5&category=21&type=multiple')  //fetch function is used to send a request to the api url
+                .then(function(response) {                                          //if the fetch is successfull the .then recieve the response from api
+                    return response.json();                                         //convert the response to json format
+                })
+                .then(function(data) {                                             //after having the response now we have to access the data
+                    quizData = data.results;                                         //store the fetched data.results in an quizdata
+                    showQuestion();                                             //call the showquestion function to display the first question
+                });
+        }
+
+
+
+
+
+        // Display the current question and answers
+ function showQuestion() {        //create an function called showquestion to display questions and answers
+            var questionData = quizData[currentQuestion];         //stores the quizdata with current question index at questiondata variable
+            var questionElement = document.getElementById('question');  //get the question html element and stores it in questionelement variable
+            var answerButtons = document.getElementById('answer-buttons');  //get the answer html element and stores it in the answerbuttons variable
+
+            questionElement.innerHTML = questionData.question;  //updates the question area
+            answerButtons.innerHTML = '';   //clears an exisiting answer buttons before dislaying the new ones
+
+    var answers = questionData.incorrect_answers.concat(questionData.correct_answer);  //combines the correct answers with incorrect answers
+       answers.sort(function() {       //sort function is used to swap the values by the math random
+                return Math.random() - 0.5;
+            });
+
+
+            //creates the loops each answer and creates button on it
+            answers.forEach(function(answer) {
+                var button = document.createElement('button');  //create an button element and store it in the variable
+                button.innerText = answer;                      //set the text of button to be the answer
+                button.onclick = function() {              //creates an button on click function
+                    checkAnswer(answer, questionData.correct_answer);    //it checks the selected answer whether it is correct
+                };
+                answerButtons.appendChild(button);               //append the newly created buttons to answerbuttons
+            });
+        }
+
+
+
+
+
+
+
+        // Check if the selected answer is correct
+        function checkAnswer(selected, correct) {  //this function checks the selected answer matches the correct answer
+            if (selected === correct) {
+                score++;                     //compares the users selected answer with correct answer if the answer is correct then the score will increment by 1
+            }
+            currentQuestion++;              //moves to next question by incrementing current question index
+            if (currentQuestion < quizData.length) {   //if current question index is less than quizdatalength then the next question will display on the screen
+                showQuestion();    //if the above condition is passed it shows the next question
+            } else {
+                document.getElementById('question-container').style.display = 'none';  //hides the question container when the all the questions is answered
+                document.getElementById('score').style.display = 'block';   //displays the score
+                document.getElementById('score').innerText = 'Your score: ' + score + '/' + quizData.length;
+            }
+        }
+
+        // Start the quiz by fetching questions
+        fetchQuestions();
+    </script>
+</body>
+</html>

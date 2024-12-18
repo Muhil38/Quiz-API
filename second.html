@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Game</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="quiz-container">
+        <h1>Quiz Game</h1>
+        <form id="quiz-form">
+
+
+            <div class="question">
+                <p>1. What is the capital of France?</p>
+                <input type="radio" name="q1" value="Paris" id="q1a">
+                <label for="q1a">Paris</label><br>  
+                <input type="radio" name="q1" value="London" id="q1b">
+                <label for="q1b">London</label><br>
+                <input type="radio" name="q1" value="Berlin" id="q1c">
+                <label for="q1c">Berlin</label>
+            </div>
+
+
+            <div class="question">
+                <p>2. Which language is used for web apps?</p>
+                <input type="radio" name="q2" value="JavaScript" id="q2a">
+                <label for="q2a">JavaScript</label><br>
+                <input type="radio" name="q2" value="Python" id="q2b">
+                <label for="q2b">Python</label><br>
+                <input type="radio" name="q2" value="Java" id="q2c">
+                <label for="q2c">Java</label>
+            </div>
+
+
+            
+            <div class="question">
+                <p>3. Who is the founder of Microsoft?</p>
+                <input type="radio" name="q3" value="Bill Gates" id="q3a">
+                <label for="q3a">Bill Gates</label><br>
+                <input type="radio" name="q3" value="Steve Jobs" id="q3b">
+                <label for="q3b">Steve Jobs</label><br>
+                <input type="radio" name="q3" value="Mark Zuckerberg" id="q3c">
+                <label for="q3c">Mark Zuckerberg</label>
+            </div>
+
+            <button type="button" onclick="calculateScore()">Submit</button>
+        </form>
+
+        <div id="result"></div>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

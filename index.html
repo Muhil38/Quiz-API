@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+<style>
+    *{
+        padding: 0;
+        margin: 0;
+    }
+    body{
+        background-color: rgb(12, 22, 44);
+    }
+    .main{
+        margin-left: 200px;
+        margin-top: 50px;
+        background-color: white;
+        width:450px;
+        padding: 20px;
+    }
+    
+    h1{
+        font-size: 15px;
+        margin-left: 190px;
+    }
+    #question,h2{
+        font-size: 10px;
+        margin-left: 196px;
+        padding: 10px;
+
+    }
+    .btn{
+        display: block;
+        background-color: white;
+        padding: 5px;
+        width: 420px;
+        margin-left: 250px;
+        margin: 20px;
+        border: 1px solid gray;
+        }
+        .btn:hover{
+            background-color: rgb(12, 22, 44);
+            color: white;
+        }
+    #nxt-btn{
+            margin-left: 180px;
+            width: 100px;
+            padding: 5px;
+            background-color: white;
+            border: 1px solid gray;
+        }
+        #nxt-btn:hover{
+            background-color: rgb(12, 22, 44);
+            color: white;
+        }                  
+
+
+                                                                      
+</style>
+  
+
+   <div class="main">
+    <header>
+       <h1>Quiz Game</h1>
+    </header>
+    <div class="quiz">
+        <h2 id="question">Questions</h2>
+        <div class="answer-buttons">
+            <button class="btn">Answer 1</button>
+            <button class="btn">Answer 2</button>
+            <button class="btn">Answer 3</button>
+            <button class="btn">Answer 4</button>
+        </div>
+        <button id="nxt-btn">Next</button>
+    </div>
+</div>
+
+<script>
+    var currentQuestionIndex = 0;
+var score = 0;
+var questions = [];
+
+// Function to fetch random questions from the API
+function fetchQuestions() {
+    var apiUrl = 'https://opentdb.com/api.php?amount=5&category=18&type=multiple'; // API URL to fetch 5 questions from category 18 (Science: Computers)
+
+    fetch(apiUrl)
+        .then(function(response) {
+            return response.json(); // Convert response to JSON
+        })
+        .then(function(data) {
+            questions = data.results.map(function(questionObj) {
+                return {
+                    question: questionObj.question,
+                    answers: shuffle([questionObj.correct_answer].concat(questionObj.incorrect_answers)),
+                    correct: questionObj.correct_answer
+                };
+            });
+            startQuiz(); // Start quiz after questions are fetched
+        })
+        .catch(function(error) {
+            console.error('Error fetching questions:', error);
+        });
+}
+
+
+
+
+// Function to start the quiz by showing the first question
+function startQuiz() {
+    showQuestion(questions[currentQuestionIndex]);
+}
+
+// Function to display the current question and its answers
+function showQuestion(question) {
+    var questionElement = document.getElementById("question");
+    var answerButtons = document.getElementsByClassName("btn");
+
+    // Set the question text (using innerHTML to handle special characters)
+    questionElement.innerHTML = question.question;
+
+    // Set the answer buttons text
+    for (var i = 0; i < answerButtons.length; i++) {
+        answerButtons[i].innerText = question.answers[i];
+        answerButtons[i].addEventListener("click", selectAnswer); // Add event listener to buttons
+    }
+}
+
+
+
+
+
+// Function to handle answer selection
+function selectAnswer(event) {
+    var selectedButton = event.target;
+    var selectedAnswer = selectedButton.innerText;
+
+    // Check if selected answer is correct
+    if (selectedAnswer === questions[currentQuestionIndex].correct) {
+        score++;
+        selectedButton.style.backgroundColor = "green"; // Correct answer
+    } else {
+        selectedButton.style.backgroundColor = "red"; // Incorrect answer
+    }
+
+    // Disable answer buttons after selection
+    disableAnswerButtons();
+}
+
+// Function to disable answer buttons after selection
+function disableAnswerButtons() {
+    var answerButtons = document.getElementsByClassName("btn");
+    for (var i = 0; i < answerButtons.length; i++) {
+        answerButtons[i].disabled = true;
+    }
+}
+
+// Function to enable answer buttons for the next question
+function enableAnswerButtons() {
+    var answerButtons = document.getElementsByClassName("btn");
+    for (var i = 0; i < answerButtons.length; i++) {
+        answerButtons[i].disabled = false;
+        answerButtons[i].style.backgroundColor = "white"; // Reset button colors
+    }
+}
+
+// Function to handle the "Next" button click
+function handleNextButton() {
+    currentQuestionIndex++;
+
+    if (currentQuestionIndex < questions.length) {
+        enableAnswerButtons();
+        showQuestion(questions[currentQuestionIndex]);
+    } else {
+        endQuiz(); // If no more questions, end the quiz
+    }
+}
+
+// Function to end the quiz and display the score
+function endQuiz() {
+    var quizContainer = document.querySelector(".quiz");
+    quizContainer.innerHTML = "<h2>Quiz Over!</h2><p>Your final score is " + score + " out of " + questions.length + ".</p>";
+}
+
+// Initialize quiz by fetching questions from the API when the page loads
+document.getElementById("nxt-btn").addEventListener("click", function () {
+    handleNextButton();
+});
+
+fetchQuestions();  // Fetch questions when the script loads
+
+// Utility function to shuffle the answers
+function shuffle(array) {
+    for (var i = array.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
+    }
+    return array;
+}
+
+</script>
+
+</body>
+</html>
